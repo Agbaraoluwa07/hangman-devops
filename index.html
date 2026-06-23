@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- MAIN MENU SCREEN -->
+    <div id="main-menu" class="screen active">
+        <h1>Hangman</h1>
+        <button id="how-to-play-btn">How to Play</button>
+        <button id="play-btn">Play Game</button>
+    </div>
+
+    <!-- HOW TO PLAY SCREEN -->
+    <div id="how-to-play" class="screen">
+        <h2>How to Play</h2>
+        <p>1. Choose a category</p>
+        <p>2. Guess the hidden word one letter at a time</p>
+        <p>3. You have 8 wrong guesses before you lose</p>
+        <p>4. Guess the full word to win!</p>
+        <button id="back-btn">Back to Menu</button>
+    </div>
+
+    <!-- CATEGORY SCREEN -->
+    <div id="category-screen" class="screen">
+        <h2>Choose a Category</h2>
+        <div id="category-list"></div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <button id="back-app-btn">Back</button>
+        <button id="pause-btn">Pause</button>
+        <div id="hangman-drawing">
+            <svg viewBox="0 0 200 250" width="200" height="250">
+                <line x1="20" y1="230" x2="180" y2="230" stroke="white" stroke-width="4"/>
+                <line x1="60" y1="230" x2="60" y2="20" stroke="white" stroke-width="4"/>
+                <line x1="60" y1="20" x2="130" y2="20" stroke="white" stroke-width="4"/>
+                <line x1="130" y1="20" x2="130" y2="50" stroke="white" stroke-width="4"/>
+                <circle id="head" cx="130" cy="70" r="20" stroke="white" stroke-width="4" fill="none" class="body-part hidden"/>
+                <line id="body" x1="130" y1="90" x2="130" y2="150" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="left-arm" x1="130" y1="110" x2="100" y2="140" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="right-arm" x1="130" y1="110" x2="160" y2="140" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="left-leg" x1="130" y1="150" x2="100" y2="190" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="right-leg" x1="130" y1="150" x2="160" y2="190" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="left-foot" x1="100" y1="190" x2="80" y2="200" stroke="white" stroke-width="4" class="body-part hidden"/>
+                <line id="right-foot" x1="160" y1="190" x2="180" y2="200" stroke="white" stroke-width="4" class="body-part hidden"/>
+            </svg>
+        </div>
+        <div id="health-bar">
+            <span id="health-count">❤️ 8</span>
+        </div>
+        <div id="word-display"></div>
+        <div id="keyboard"></div>
+    </div>
+
+    <!-- PAUSE SCREEN -->
+    <div id="pause-screen" class="screen">
+        <h2>Paused</h2>
+        <button id="continue-btn">Continue</button>
+        <button id="new-category-btn">New Category</button>
+        <button id="quit-btn">Quit to Menu</button>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="screen">
+        <h2>You Win! 🎉</h2>
+        <p id="win-word"></p>
+        <button id="play-again-win">Play Again</button>
+    </div>
+
+    <!-- LOSE SCREEN -->
+    <div id="lose-screen" class="screen">
+        <h2>You Lose! 💀</h2>
+        <p id="lose-word"></p>
+        <button id="play-again-lose">Play Again</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
