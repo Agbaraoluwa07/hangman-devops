@@ -3,44 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman Game</title>
+    <title>Hangman Adventure</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- MAIN MENU SCREEN -->
     <div id="main-menu" class="screen active">
-        <h1>Hangman</h1>
-        <button id="how-to-play-btn">How to Play</button>
-        <button id="play-btn">Play Game</button>
+        <div class="logo-container">
+            <h1 class="game-title">HANGMAN</h1>
+            <p class="game-subtitle">Adventure</p>
+        </div>
+        <div class="menu-buttons">
+            <button id="play-btn" class="btn-primary">▶ Play Game</button>
+            <button id="how-to-play-btn" class="btn-secondary">? How to Play</button>
+        </div>
     </div>
 
     <!-- HOW TO PLAY SCREEN -->
     <div id="how-to-play" class="screen">
         <h2>How to Play</h2>
-        <p>1. Choose a category</p>
-        <p>2. Guess the hidden word one letter at a time</p>
-        <p>3. You have 8 wrong guesses before you lose</p>
-        <p>4. Guess the full word to win!</p>
-        <button id="back-btn">Back to Menu</button>
+        <div class="instructions">
+            <div class="instruction-item">🔤 A secret word is hidden</div>
+            <div class="instruction-item">🖱️ Click a letter to guess</div>
+            <div class="instruction-item">✅ Correct guess reveals the letter</div>
+            <div class="instruction-item">❌ Wrong guess costs you a life</div>
+            <div class="instruction-item">💀 8 wrong guesses and you lose</div>
+            <div class="instruction-item">🏆 Guess the word to win!</div>
+        </div>
+        <button id="back-btn" class="btn-primary">Back to Menu</button>
+    </div>
+
+    <!-- PLAYER NAME SCREEN -->
+    <div id="player-screen" class="screen">
+        <h2>What's Your Name?</h2>
+        <div class="input-container">
+            <input type="text" id="player-name" placeholder="Enter your name..." maxlength="15"/>
+        </div>
+        <button id="start-game-btn" class="btn-primary">Let's Play! 🚀</button>
     </div>
 
     <!-- CATEGORY SCREEN -->
     <div id="category-screen" class="screen">
-        <h2>Choose a Category</h2>
+        <h2 id="category-greeting">Choose a Category</h2>
         <div id="category-list"></div>
     </div>
 
     <!-- GAME SCREEN -->
     <div id="game-screen" class="screen">
-        <button id="back-app-btn">Back</button>
-        <button id="pause-btn">Pause</button>
+        <div class="game-header">
+            <div class="player-info">
+                <span id="player-display">👤 Player</span>
+                <span id="score-display">⭐ Score: 0</span>
+            </div>
+            <button id="pause-btn" class="btn-pause">⏸ Pause</button>
+        </div>
+
+        <div class="category-badge">
+            <span id="current-category">Geography</span>
+        </div>
+
         <div id="hangman-drawing">
             <svg viewBox="0 0 200 250" width="200" height="250">
-                <line x1="20" y1="230" x2="180" y2="230" stroke="white" stroke-width="4"/>
-                <line x1="60" y1="230" x2="60" y2="20" stroke="white" stroke-width="4"/>
-                <line x1="60" y1="20" x2="130" y2="20" stroke="white" stroke-width="4"/>
-                <line x1="130" y1="20" x2="130" y2="50" stroke="white" stroke-width="4"/>
+                <line x1="20" y1="230" x2="180" y2="230" stroke="#e94560" stroke-width="4"/>
+                <line x1="60" y1="230" x2="60" y2="20" stroke="#e94560" stroke-width="4"/>
+                <line x1="60" y1="20" x2="130" y2="20" stroke="#e94560" stroke-width="4"/>
+                <line x1="130" y1="20" x2="130" y2="50" stroke="#e94560" stroke-width="4"/>
                 <circle id="head" cx="130" cy="70" r="20" stroke="white" stroke-width="4" fill="none" class="body-part hidden"/>
                 <line id="body" x1="130" y1="90" x2="130" y2="150" stroke="white" stroke-width="4" class="body-part hidden"/>
                 <line id="left-arm" x1="130" y1="110" x2="100" y2="140" stroke="white" stroke-width="4" class="body-part hidden"/>
@@ -51,33 +79,47 @@
                 <line id="right-foot" x1="160" y1="190" x2="180" y2="200" stroke="white" stroke-width="4" class="body-part hidden"/>
             </svg>
         </div>
+
         <div id="health-bar">
-            <span id="health-count">❤️ 8</span>
+            <span id="health-hearts">❤️❤️❤️❤️❤️❤️❤️❤️</span>
         </div>
+
         <div id="word-display"></div>
+        <div id="hint-container">
+            <span id="hint-text"></span>
+        </div>
         <div id="keyboard"></div>
     </div>
 
     <!-- PAUSE SCREEN -->
     <div id="pause-screen" class="screen">
-        <h2>Paused</h2>
-        <button id="continue-btn">Continue</button>
-        <button id="new-category-btn">New Category</button>
-        <button id="quit-btn">Quit to Menu</button>
+        <h2>⏸ Paused</h2>
+        <button id="continue-btn" class="btn-primary">▶ Continue</button>
+        <button id="new-category-btn" class="btn-secondary">🗂 New Category</button>
+        <button id="quit-btn" class="btn-danger">🚪 Quit to Menu</button>
     </div>
 
     <!-- WIN SCREEN -->
     <div id="win-screen" class="screen">
-        <h2>You Win! 🎉</h2>
-        <p id="win-word"></p>
-        <button id="play-again-win">Play Again</button>
+        <div class="result-container">
+            <h2 class="win-title">🎉 You Won!</h2>
+            <div class="celebration">⭐⭐⭐</div>
+            <p id="win-word"></p>
+            <p id="win-score"></p>
+        </div>
+        <button id="play-again-win" class="btn-primary">Play Again 🚀</button>
+        <button id="new-category-win" class="btn-secondary">New Category</button>
     </div>
 
     <!-- LOSE SCREEN -->
     <div id="lose-screen" class="screen">
-        <h2>You Lose! 💀</h2>
-        <p id="lose-word"></p>
-        <button id="play-again-lose">Play Again</button>
+        <div class="result-container">
+            <h2 class="lose-title">💀 Game Over!</h2>
+            <p id="lose-word"></p>
+            <p id="lose-score"></p>
+        </div>
+        <button id="play-again-lose" class="btn-primary">Try Again 💪</button>
+        <button id="new-category-lose" class="btn-secondary">New Category</button>
     </div>
 
     <script src="game.js"></script>
