@@ -419,3 +419,67 @@ p {
     color: #a8b2d8;
     line-height: 2;
 }
+/* ===== MOBILE VIEW ===== */
+@media (max-width: 480px) {
+    .game-title {
+        font-size: 3rem;
+        letter-spacing: 8px;
+    }
+
+    #category-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .category-btn {
+        padding: 15px 10px;
+        font-size: 0.85rem;
+    }
+
+    .key {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    #keyboard {
+        gap: 5px;
+        max-width: 320px;
+    }
+
+    .letter-box {
+        width: 28px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    #hangman-drawing svg {
+        width: 150px;
+        height: 180px;
+    }
+
+    .btn-primary, .btn-secondary, .btn-danger {
+        padding: 14px 30px;
+        font-size: 0.95rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ===== TABLET VIEW ===== */
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 3.5rem;
+    }
+
+    #keyboard {
+        max-width: 400px;
+    }
+
+    .key {
+        width: 36px;
+        height: 36px;
+    }
+}
