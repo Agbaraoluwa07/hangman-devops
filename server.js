@@ -9,6 +9,7 @@ const analyticsFile = path.join(dataDir, 'analytics.json');
 const feedbackFile = path.join(dataDir, 'feedback.json');
 const adminFile = path.join(rootDir, 'admin.html');
 const indexFile = path.join(rootDir, 'index.html');
+const ADMIN_PASSWORD = 'Davidagbaraoluwa19$';
 
 function ensureDataFile() {
     if (!fs.existsSync(dataDir)) {
@@ -102,6 +103,14 @@ function getContentType(filePath) {
     }
 }
 
+function sendHtml(res, body, statusCode = 200, extraHeaders = {}) {
+    res.writeHead(statusCode, {
+        'Content-Type': 'text/html; charset=utf-8',
+        ...extraHeaders
+    });
+    res.end(body);
+}
+
 function serveStaticFile(res, filePath) {
     if (!fs.existsSync(filePath)) {
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -111,6 +120,91 @@ function serveStaticFile(res, filePath) {
 
     res.writeHead(200, { 'Content-Type': getContentType(filePath) });
     fs.createReadStream(filePath).pipe(res);
+}
+
+function getCookieValue(req, name) {
+    const header = req.headers.cookie || '';
+    return header.split(';').map(cookie => cookie.trim()).find(cookie => cookie.startsWith(`${name}=`))?.split('=').slice(1).join('=') || null;
+}
+
+function parseFormBody(req) {
+    return new Promise(resolve => {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk;
+        });
+        req.on('end', () => {
+            if (!body) {
+                resolve({});
+                return;
+            }
+
+            const result = {};
+            body.split('&').forEach(part => {
+                if (!part) return;
+                const [rawKey, ...rawValueParts] = part.split('=');
+                const key = decodeURIComponent(rawKey || '');
+                const value = decodeURIComponent(rawValueParts.join('=') || '');
+                result[key] = value;
+            });
+            resolve(result);
+        });
+    });
+}
+
+function getAdminLoginPage(errorMessage = '') {
+    const message = errorMessage ? `<p style="color:#ff8f8f; margin-top:8px;">${errorMessage}</p>` : '';
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111827; color: #f9fafb; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+    .card { background: #1f2937; padding: 24px; border-radius: 16px; width: min(92vw, 360px); box-shadow: 0 16px 45px rgba(0,0,0,0.25); }
+    h1 { margin-top: 0; font-size: 1.4rem; }
+    input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #374151; background: #111827; color: #f9fafb; margin-top: 8px; }
+    button { margin-top: 12px; width: 100%; padding: 10px 12px; background: #e94560; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .hint { color: #9ca3af; font-size: 0.9rem; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Admin Access</h1>
+    <p class="hint">Enter the admin password to continue.</p>
+    <form method="POST" action="/admin">
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Log in</button>
+    </form>
+    ${message}
+  </div>
+</body>
+</html>`;
+}
+
+async function serveAdminPage(req, res) {
+    if (req.method === 'POST') {
+        const form = await parseFormBody(req);
+        const password = String(form.password || '').trim();
+
+        if (password === ADMIN_PASSWORD) {
+            sendHtml(res, fs.readFileSync(adminFile, 'utf8'), 200, {
+                'Set-Cookie': 'adminAuth=1; HttpOnly; Path=/; Max-Age=86400'
+            });
+            return;
+        }
+
+        sendHtml(res, getAdminLoginPage('Incorrect password. Please try again.'), 401);
+        return;
+    }
+
+    if (getCookieValue(req, 'adminAuth') === '1') {
+        serveStaticFile(res, adminFile);
+        return;
+    }
+
+    sendHtml(res, getAdminLoginPage());
 }
 
 function createServer() {
@@ -360,7 +454,7 @@ function createServer() {
         }
 
         if (pathname === '/admin') {
-            serveStaticFile(res, adminFile);
+            serveAdminPage(req, res);
             return;
         }
 
