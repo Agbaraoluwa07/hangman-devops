@@ -1,0 +1,76 @@
+{
+  "sessions": [
+    {
+      "id": "session-1782519857069",
+      "username": "Ada",
+      "durationSeconds": 120,
+      "at": "2026-06-27T00:24:17.069Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "session-1782520680624",
+      "username": "Ada",
+      "durationSeconds": 120,
+      "at": "2026-06-27T00:38:00.624Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "session-1782520725248",
+      "username": "Ada",
+      "durationSeconds": 120,
+      "at": "2026-06-27T00:38:45.248Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "session-1782520757771",
+      "username": "Ada",
+      "durationSeconds": 120,
+      "at": "2026-06-27T00:39:17.771Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "session-1782520794363",
+      "username": "Ada",
+      "durationSeconds": 120,
+      "at": "2026-06-27T00:39:54.363Z",
+      "day": "2026-06-27"
+    }
+  ],
+  "copyEvents": [
+    {
+      "id": "copy-1782519857088",
+      "username": "Ada",
+      "addressType": "ETH",
+      "at": "2026-06-27T00:24:17.088Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "copy-1782520680634",
+      "username": "Ada",
+      "addressType": "ETH",
+      "at": "2026-06-27T00:38:00.634Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "copy-1782520725263",
+      "username": "Ada",
+      "addressType": "ETH",
+      "at": "2026-06-27T00:38:45.263Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "copy-1782520757784",
+      "username": "Ada",
+      "addressType": "ETH",
+      "at": "2026-06-27T00:39:17.784Z",
+      "day": "2026-06-27"
+    },
+    {
+      "id": "copy-1782520794370",
+      "username": "Ada",
+      "addressType": "ETH",
+      "at": "2026-06-27T00:39:54.370Z",
+      "day": "2026-06-27"
+    }
+  ]
+}

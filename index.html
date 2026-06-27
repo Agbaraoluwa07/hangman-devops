@@ -3,134 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman Adventure</title>
+    <title>GuessMaster</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- MAIN MENU SCREEN -->
+    <!-- MAIN MENU -->
     <div id="main-menu" class="screen active">
         <div class="logo-container">
-            <h1 class="game-title">HANGMAN</h1>
-            <p class="game-subtitle">Adventure</p>
+            <h1 class="game-title">GUESS</h1>
+            <h1 class="game-title-2">MASTER</h1>
+            <p class="game-subtitle">by LE Games</p>
         </div>
         <div class="menu-buttons">
             <button id="play-btn" class="btn-primary">▶ Play Game</button>
             <button id="how-to-play-btn" class="btn-secondary">? How to Play</button>
         </div>
+        <div class="donation-section">
+            <p class="donation-title">☕ Support LE Games</p>
+            <p class="donation-subtitle">Enjoying GuessMaster? Send SOL or ETH!</p>
+            <button class="donate-toggle-btn">Donate</button>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">SOL</span>
+                    <span class="address-value" data-address="HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv">HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">ETH</span>
+                    <span class="address-value" data-address="0x42f272f9A311BDC99d2DcA6b482a663d335fAc02">0x42f272f9A311BDC99d2DcA6b482a663d335fAc02</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <p class="copy-confirm hidden">✅ Copied!</p>
+        </div>
+        <p class="unlimited-tag">UNLIMITED WORD CHAIN</p>
     </div>
 
-    <!-- HOW TO PLAY SCREEN -->
+    <!-- HOW TO PLAY -->
     <div id="how-to-play" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">← Back</button>
         <h2>How to Play</h2>
         <div class="instructions">
-            <div class="instruction-item">🔤 A secret word is hidden</div>
-            <div class="instruction-item">🖱️ Click a letter to guess</div>
-            <div class="instruction-item">✅ Correct guess reveals the letter</div>
+            <div class="instruction-item">🔤 A secret word is hidden on the board</div>
+            <div class="instruction-item">🔗 Each word connects to the next through a shared letter</div>
+            <div class="instruction-item">💡 Use hints to help you guess</div>
             <div class="instruction-item">❌ Wrong guess costs you a life</div>
-            <div class="instruction-item">💀 8 wrong guesses and you lose</div>
-            <div class="instruction-item">🏆 Guess the word to win!</div>
+            <div class="instruction-item">💀 Lose all 8 lives and it's game over</div>
+            <div class="instruction-item">🏆 Fill the board with as many words as you can!</div>
         </div>
-        <button id="back-btn" class="btn-primary">Back to Menu</button>
+        <button class="btn-primary" onclick="showScreen('main-menu')">Back to Menu</button>
     </div>
 
-    <!-- PLAYER NAME SCREEN -->
+    <!-- PLAYER NAME -->
     <div id="player-screen" class="screen">
+        <button class="back-btn" onclick="showScreen('main-menu')">← Back</button>
         <h2>What's Your Name?</h2>
         <div class="input-container">
-            <input type="text" id="player-name" placeholder="Enter your name..." maxlength="15"/>
+            <input type="text" id="player-name" placeholder="Enter your name..." maxlength="15" list="username-suggestions"/>
+            <datalist id="username-suggestions"></datalist>
         </div>
+        <p id="player-status" class="player-status">Choose a new username or pick one from the suggestions.</p>
         <button id="start-game-btn" class="btn-primary">Let's Play! 🚀</button>
-    </div>
-
-    <!-- CATEGORY SCREEN -->
-    <div id="category-screen" class="screen">
-        <h2 id="category-greeting">Choose a Category</h2>
-        <div id="category-list"></div>
     </div>
 
     <!-- GAME SCREEN -->
     <div id="game-screen" class="screen">
         <div class="game-header">
+            <button class="back-btn-inline" onclick="showScreen('pause-screen')">← Back</button>
             <div class="player-info">
                 <span id="player-display">👤 Player</span>
                 <span id="score-display">⭐ Score: 0</span>
             </div>
-            <button id="pause-btn" class="btn-pause">⏸ Pause</button>
-        </div>
-
-        <div class="category-badge">
-            <span id="current-category">Geography</span>
-        </div>
-
-        <div id="hangman-drawing">
-            <svg viewBox="0 0 200 250" width="200" height="250">
-                <line x1="20" y1="230" x2="180" y2="230" stroke="#e94560" stroke-width="4"/>
-                <line x1="60" y1="230" x2="60" y2="20" stroke="#e94560" stroke-width="4"/>
-                <line x1="60" y1="20" x2="130" y2="20" stroke="#e94560" stroke-width="4"/>
-                <line x1="130" y1="20" x2="130" y2="50" stroke="#e94560" stroke-width="4"/>
-                <circle id="head" cx="130" cy="70" r="20" stroke="white" stroke-width="4" fill="none" class="body-part hidden"/>
-                <line id="body" x1="130" y1="90" x2="130" y2="150" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="left-arm" x1="130" y1="110" x2="100" y2="140" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="right-arm" x1="130" y1="110" x2="160" y2="140" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="left-leg" x1="130" y1="150" x2="100" y2="190" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="right-leg" x1="130" y1="150" x2="160" y2="190" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="left-foot" x1="100" y1="190" x2="80" y2="200" stroke="white" stroke-width="4" class="body-part hidden"/>
-                <line id="right-foot" x1="160" y1="190" x2="180" y2="200" stroke="white" stroke-width="4" class="body-part hidden"/>
-            </svg>
+            <button id="pause-btn" class="btn-pause">⏸</button>
         </div>
 
         <div id="health-bar">
             <span id="health-hearts">❤️❤️❤️❤️❤️❤️❤️❤️</span>
         </div>
-
-        <div id="word-display"></div>
-        <div id="hint-container">
-            <span id="hint-text"></span>
+        <div class="life-shop">
+            <span id="life-balance">Lives: 8</span>
+            <button id="buy-life-btn" class="buy-life-btn">Buy 1 life for $100</button>
         </div>
+
+        <!-- FIXED GRID BOARD -->
+        <div id="board-container">
+            <div id="scrabble-board">
+                <div id="grid-cells"></div>
+                <div id="hangman-center">
+                    <svg id="game-character" viewBox="0 0 80 100" width="65" height="65">
+                        <line x1="5" y1="95" x2="40" y2="95" stroke="#e94560" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="15" y1="95" x2="15" y2="5" stroke="#e94560" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="15" y1="5" x2="48" y2="5" stroke="#e94560" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="48" y1="5" x2="48" y2="18" stroke="#e94560" stroke-width="3" stroke-linecap="round"/>
+                        <circle id="char-head" cx="48" cy="28" r="10" fill="#FFD700" stroke="#FFA500" stroke-width="1.5" class="char-part hidden"/>
+                        <circle id="char-eye-left" cx="44" cy="26" r="1.8" fill="#333" class="char-part hidden"/>
+                        <circle id="char-eye-right" cx="52" cy="26" r="1.8" fill="#333" class="char-part hidden"/>
+                        <path id="char-mouth-happy" d="M 43 32 Q 48 37 53 32" stroke="#333" stroke-width="1.5" fill="none" class="char-part hidden"/>
+                        <path id="char-mouth-sad" d="M 43 35 Q 48 30 53 35" stroke="#333" stroke-width="1.5" fill="none" class="char-part hidden"/>
+                        <line id="char-body" x1="48" y1="38" x2="48" y2="62" stroke="#4A90D9" stroke-width="4" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-arm-left" x1="48" y1="48" x2="34" y2="58" stroke="#4A90D9" stroke-width="3" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-arm-right" x1="48" y1="48" x2="62" y2="58" stroke="#4A90D9" stroke-width="3" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-leg-left" x1="48" y1="62" x2="36" y2="80" stroke="#333" stroke-width="3" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-leg-right" x1="48" y1="62" x2="60" y2="80" stroke="#333" stroke-width="3" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-foot-left" x1="36" y1="80" x2="26" y2="86" stroke="#333" stroke-width="2.5" stroke-linecap="round" class="char-part hidden"/>
+                        <line id="char-foot-right" x1="60" y1="80" x2="70" y2="86" stroke="#333" stroke-width="2.5" stroke-linecap="round" class="char-part hidden"/>
+                        <circle id="sweat1" cx="62" cy="20" r="3" fill="#64B5F6" class="char-part hidden"/>
+                        <circle id="sweat2" cx="68" cy="28" r="2" fill="#64B5F6" class="char-part hidden"/>
+                    </svg>
+                    <div id="reaction" class="reaction hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CURRENT WORD INFO -->
+        <div id="current-word-info">
+            <div id="category-badge" class="category-badge"></div>
+            <div id="session-target" class="session-target"></div>
+            <div class="hint-row">
+                <span id="hint-text" class="hint-text"></span>
+                <button id="more-hint-btn" class="more-hint-btn">+ More hint</button>
+            </div>
+            <div id="word-display"></div>
+        </div>
+
         <div id="keyboard"></div>
     </div>
 
     <!-- PAUSE SCREEN -->
     <div id="pause-screen" class="screen">
+        <button class="back-btn" onclick="showScreen('game-screen')">← Back</button>
         <h2>⏸ Paused</h2>
         <button id="continue-btn" class="btn-primary">▶ Continue</button>
-        <button id="new-category-btn" class="btn-secondary">🗂 New Category</button>
         <button id="quit-btn" class="btn-danger">🚪 Quit to Menu</button>
     </div>
 
     <!-- WIN SCREEN -->
     <div id="win-screen" class="screen">
-        <div class="result-container">
-            <h2 class="win-title">🎉 You Won!</h2>
-            <div class="celebration">⭐⭐⭐</div>
-            <p id="win-word"></p>
-            <p id="win-score"></p>
+        <button class="back-btn" onclick="showScreen('main-menu')">← Back</button>
+        <h2 class="win-title">🎉 You Won!</h2>
+        <div class="celebration">⭐⭐⭐</div>
+        <div class="stats-row">
+            <div class="stat-box"><div class="stat-num" id="win-words">0</div><div class="stat-label">Words</div></div>
+            <div class="stat-box"><div class="stat-num" id="win-score">0</div><div class="stat-label">Score</div></div>
+            <div class="stat-box"><div class="stat-num" id="win-lives">0</div><div class="stat-label">Lives left</div></div>
+        </div>
+        <div class="ad-billboard">
+            <p class="ad-billboard-title">Sponsored</p>
+            <div class="ad-billboard-box">
+                <img class="ad-billboard-image" src="" alt="Sponsored ad" />
+                <p class="ad-billboard-text">Your next favorite app is waiting.</p>
+                <p class="ad-billboard-subtext">Ad space for partners and promotions.</p>
+            </div>
+        </div>
+        <div class="donation-section end-screen-donation">
+            <p class="donation-title">☕ Support LE Games</p>
+            <p class="donation-subtitle">Enjoying GuessMaster? Send SOL or ETH!</p>
+            <button class="donate-toggle-btn">Donate</button>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">SOL</span>
+                    <span class="address-value" data-address="HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv">HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">ETH</span>
+                    <span class="address-value" data-address="0x42f272f9A311BDC99d2DcA6b482a663d335fAc02">0x42f272f9A311BDC99d2DcA6b482a663d335fAc02</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <p class="copy-confirm hidden">✅ Copied!</p>
         </div>
         <button id="play-again-win" class="btn-primary">Play Again 🚀</button>
-        <button id="new-category-win" class="btn-secondary">New Category</button>
+        <button onclick="showScreen('main-menu')" class="btn-secondary">Main Menu</button>
     </div>
 
     <!-- LOSE SCREEN -->
     <div id="lose-screen" class="screen">
-        <div class="result-container">
-            <h2 class="lose-title">💀 Game Over!</h2>
-            <p id="lose-word"></p>
-            <p id="lose-score"></p>
+        <button class="back-btn" onclick="showScreen('main-menu')">← Back</button>
+        <h2 class="lose-title">💀 Game Over!</h2>
+        <div class="stats-row">
+            <div class="stat-box"><div class="stat-num" id="lose-words">0</div><div class="stat-label">Words</div></div>
+            <div class="stat-box"><div class="stat-num" id="lose-score">0</div><div class="stat-label">Score</div></div>
+            <div class="stat-box"><div class="stat-num">0</div><div class="stat-label">Lives left</div></div>
+        </div>
+        <p id="lose-word" class="reveal-word"></p>
+        <div class="ad-billboard">
+            <p class="ad-billboard-title">Sponsored</p>
+            <div class="ad-billboard-box">
+                <img class="ad-billboard-image" src="" alt="Sponsored ad" />
+                <p class="ad-billboard-text">Your next favorite app is waiting.</p>
+                <p class="ad-billboard-subtext">Ad space for partners and promotions.</p>
+            </div>
+        </div>
+        <div class="donation-section end-screen-donation">
+            <p class="donation-title">☕ Support LE Games</p>
+            <p class="donation-subtitle">Enjoying GuessMaster? Send SOL or ETH!</p>
+            <button class="donate-toggle-btn">Donate</button>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">SOL</span>
+                    <span class="address-value" data-address="HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv">HSzFqKqAipExrYogzMak42aiMyc9ta2rv7L22TzaeFwv</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <div class="donation-address-row hidden">
+                <div class="address-block">
+                    <span class="address-label">ETH</span>
+                    <span class="address-value" data-address="0x42f272f9A311BDC99d2DcA6b482a663d335fAc02">0x42f272f9A311BDC99d2DcA6b482a663d335fAc02</span>
+                </div>
+                <button class="copy-btn" onclick="copyAddress(this)">Copy</button>
+            </div>
+            <p class="copy-confirm hidden">✅ Copied!</p>
         </div>
         <button id="play-again-lose" class="btn-primary">Try Again 💪</button>
-        <button id="new-category-lose" class="btn-secondary">New Category</button>
+        <button onclick="showScreen('main-menu')" class="btn-secondary">Main Menu</button>
+    </div>
+
+    <div id="retry-modal" class="retry-modal-overlay hidden" aria-hidden="true">
+        <div class="retry-modal-card">
+            <div class="retry-modal-badge">GuessMaster</div>
+            <h3 class="retry-modal-title">One more round?</h3>
+            <p id="retry-modal-message" class="retry-modal-message">You lost this round. Retry by paying $50 and keep the streak alive?</p>
+            <div class="retry-modal-actions">
+                <button id="retry-cancel-btn" class="btn-secondary retry-modal-btn">No thanks</button>
+                <button id="retry-confirm-btn" class="btn-primary retry-modal-btn">Retry now</button>
+            </div>
+        </div>
     </div>
 
     <script src="game.js"></script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker failed:', err));
-        });
-    }
-</script>
 </body>
 </html>

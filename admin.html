@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GuessMaster Ads Admin</title>
+    <style>
+        :root { color-scheme: dark; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f7f7f7;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 4px; }
+        .card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.2);
+        }
+        h1, h2 { color: #ffd166; }
+        form { display: grid; gap: 10px; }
+        label { font-size: 0.9rem; color: #e8ebff; }
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.16);
+            font: inherit;
+        }
+        input, textarea, select { background: rgba(255,255,255,0.06); color: white; }
+        button {
+            cursor: pointer;
+            background: linear-gradient(135deg, #e94560, #c23152);
+            color: white;
+            border: none;
+            font-weight: 700;
+        }
+        .inline { display: flex; gap: 8px; align-items: center; }
+        .inline input { width: auto; }
+        .ad-list { display: grid; gap: 12px; }
+        @media (max-width: 700px) {
+            body { padding: 12px; }
+            .card { padding: 14px; }
+            h1 { font-size: 1.35rem; }
+            h2 { font-size: 1.1rem; }
+            .actions { flex-direction: column; }
+        }
+        .ad-item {
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 12px;
+            background: rgba(0,0,0,0.16);
+        }
+        .muted { color: #a8b2d8; font-size: 0.84rem; }
+        .actions { display: flex; gap: 8px; margin-top: 10px; }
+        .danger { background: #4b1d2e; }
+        .status { margin-top: 10px; color: #7ee7a8; }
+        .status.error { color: #ff8f8f; }
+        .image-preview {
+            display: none;
+            max-width: 220px;
+            max-height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.16);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>GuessMaster Sponsored Ad Manager</h1>
+            <p class="muted">Add ad creatives, links, and monitor clicks from one place.</p>
+            <form id="ad-form">
+                <label>Title
+                    <input type="text" id="title" placeholder="Sponsored" required />
+                </label>
+                <label>Main text
+                    <textarea id="text" rows="2" placeholder="Your next favorite app is waiting." required></textarea>
+                </label>
+                <label>Subtext
+                    <textarea id="subtext" rows="2" placeholder="Ad space for partners and promotions."></textarea>
+                </label>
+                <label>Destination link
+                    <input type="url" id="link" placeholder="https://example.com" required />
+                </label>
+                <label>Image URL or upload (optional)
+                    <input type="url" id="imageUrl" placeholder="https://example.com/image.png" />
+                </label>
+                <label>Upload image file
+                    <input type="file" id="imageFile" accept="image/*" />
+                </label>
+                <img id="imagePreview" class="image-preview" alt="Ad preview" />
+                <label class="inline">
+                    <input type="checkbox" id="active" checked />
+                    <span>Show this ad in the app</span>
+                </label>
+                <button type="submit">Save ad</button>
+            </form>
+            <div id="status" class="status"></div>
+        </div>
+
+        <div class="card">
+            <h2>Analytics Snapshot</h2>
+            <div id="analytics" class="ad-list"></div>
+        </div>
+
+        <div class="card">
+            <h2>Existing Ads</h2>
+            <div id="ad-list" class="ad-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('ad-form');
+        const list = document.getElementById('ad-list');
+        const analytics = document.getElementById('analytics');
+        const status = document.getElementById('status');
+        const imageFileInput = document.getElementById('imageFile');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const imagePreview = document.getElementById('imagePreview');
+
+        function showImagePreview(src) {
+            if (!src) {
+                imagePreview.style.display = 'none';
+                imagePreview.removeAttribute('src');
+                return;
+            }
+            imagePreview.src = src;
+            imagePreview.style.display = 'block';
+        }
+
+        imageFileInput.addEventListener('change', async () => {
+            const file = imageFileInput.files[0];
+            if (!file) {
+                showImagePreview('');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => showImagePreview(reader.result);
+            reader.readAsDataURL(file);
+        });
+
+        imageUrlInput.addEventListener('input', () => {
+            if (imageUrlInput.value.trim()) {
+                showImagePreview(imageUrlInput.value.trim());
+            } else {
+                showImagePreview('');
+            }
+        });
+
+        async function loadAnalytics() {
+            const res = await fetch('/api/analytics');
+            const data = await res.json();
+            analytics.innerHTML = `
+                <div class="ad-item">
+                    <strong>Overview</strong>
+                    <p class="muted">Active ads: ${data.activeAds || 0}</p>
+                    <p class="muted">Total views: ${data.totalViews || 0}</p>
+                    <p class="muted">Total clicks: ${data.totalClicks || 0}</p>
+                    <p class="muted">CTR: ${data.ctr || 0}%</p>
+                    <p class="muted">Top ad: ${data.topAd ? data.topAd.title : 'None yet'}</p>
+                </div>
+                <div class="ad-item">
+                    <strong>User sessions</strong>
+                    ${data.dailySummary && data.dailySummary.length ? data.dailySummary.map(item => `<p class="muted">${item.day} • ${item.activeUsers} active users • ${item.totalDurationSeconds}s total</p>`).join('') : '<p class="muted">No session data yet.</p>'}
+                </div>
+                <div class="ad-item">
+                    <strong>Per-user activity</strong>
+                    ${data.userDailySummary && data.userDailySummary.length ? data.userDailySummary.map(item => `<p class="muted">${item.day} • ${item.uniqueUsers} users • ${item.totalDurationSeconds}s total</p>`).join('') : '<p class="muted">No per-user data yet.</p>'}
+                </div>
+                <div class="ad-item">
+                    <strong>Donation & feedback</strong>
+                    <p class="muted">Crypto addresses copied: ${data.copyEventsCount || 0}</p>
+                    <p class="muted">Feedback messages: ${data.feedbackCount || 0}</p>
+                    ${data.feedbackItems && data.feedbackItems.length ? data.feedbackItems.map(item => `<p class="muted">${item.username} • ${item.message} • ${new Date(item.at).toLocaleString()}</p>`).join('') : '<p class="muted">No feedback yet.</p>'}
+                </div>
+                <div class="ad-item">
+                    <strong>Recent activity</strong>
+                    ${data.recentActivity && data.recentActivity.length ? data.recentActivity.map(item => `<p class="muted">${item.type.toUpperCase()} • ${item.adTitle} • ${new Date(item.at).toLocaleString()}</p>`).join('') : '<p class="muted">No activity yet.</p>'}
+                </div>
+            `;
+        }
+
+        async function loadAds() {
+            const res = await fetch('/api/ads?all=1');
+            const ads = await res.json();
+            list.innerHTML = '';
+            if (!ads.length) {
+                list.innerHTML = '<p class="muted">No ads yet.</p>';
+                return;
+            }
+
+            ads.forEach(ad => {
+                const item = document.createElement('div');
+                item.className = 'ad-item';
+                item.innerHTML = `
+                    <strong>${ad.title}</strong>
+                    <p>${ad.text}</p>
+                    <p class="muted">${ad.subtext || ''}</p>
+                    <p class="muted">Link: <a href="${ad.link}" target="_blank" rel="noopener noreferrer" style="color:#ffd166">${ad.link}</a></p>
+                    ${ad.imageUrl ? `<p class="muted">Image: <a href="${ad.imageUrl}" target="_blank" rel="noopener noreferrer" style="color:#ffd166">${ad.imageUrl}</a></p>` : ''}
+                    <p class="muted">Status: ${ad.active === false ? 'Hidden' : 'Live'} • Views: ${ad.views || 0} • Clicks: ${ad.clicks || 0}</p>
+                    <div class="actions">
+                        <button class="danger" data-delete="${ad.id}">Delete</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            status.className = 'status';
+            status.textContent = 'Saving...';
+
+            let imageValue = imageUrlInput.value.trim();
+            const file = imageFileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                imageValue = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const payload = {
+                title: document.getElementById('title').value.trim(),
+                text: document.getElementById('text').value.trim(),
+                subtext: document.getElementById('subtext').value.trim(),
+                link: document.getElementById('link').value.trim(),
+                imageUrl: imageValue,
+                active: document.getElementById('active').checked
+            };
+
+            const res = await fetch('/api/ads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (!res.ok) {
+                status.className = 'status error';
+                status.textContent = result.error || 'Could not save ad';
+                return;
+            }
+            form.reset();
+            imageFileInput.value = '';
+            showImagePreview('');
+            document.getElementById('active').checked = true;
+            status.textContent = 'Ad saved successfully.';
+            loadAnalytics();
+            loadAds();
+        });
+
+        ['title', 'text', 'link'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                if (status.textContent === 'Saving...') return;
+                status.className = 'status';
+                status.textContent = '';
+            });
+        });
+
+        list.addEventListener('click', async (event) => {
+            const button = event.target.closest('[data-delete]');
+            if (!button) return;
+            const id = button.getAttribute('data-delete');
+            const res = await fetch(`/api/ads/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadAnalytics();
+                loadAds();
+            }
+        });
+
+        loadAnalytics();
+        loadAds();
+    </script>
+</body>
+</html>
